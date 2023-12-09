@@ -1,14 +1,22 @@
 class UsersController < ApplicationController
-  def search
-    search_params = params.permit(:name, :email, :phone, :zipcode, :company_name, :street)
-    user_query = build_user_query(search_params)
-    address_query = build_address_query(search_params)
+  # GET /users
+  def index
+    users = User.all.includes(:address)
+    render json: users, include: :address
+  end
 
-    users = User.joins(:address).where(user_query).where(addresses: address_query)
+  # GET /users/search
+  def search
+    search_params = user_search_params
+    users = User.joins(:address).where(build_user_query(search_params)).where(addresses: build_address_query(search_params))
     render json: users
   end
 
   private
+
+  def user_search_params
+    params.permit(:name, :email, :phone, :zipcode, :company_name, :street)
+  end
 
   def build_user_query(params)
     query = {}
