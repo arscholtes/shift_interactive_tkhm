@@ -53,57 +53,59 @@ RSpec.describe UsersController, type: :controller do
         expect(parsed_response['error']).to eq('No users found matching the search criteria')
       end
     end
-  end
 
-  context "when invalid parameters are passed" do
-    it "handles invalid parameters gracefully" do
-      get :search, params: { invalid_param: 'invalid' }
+    context "when invalid parameters are passed" do
+      it "handles invalid parameters gracefully" do
+        get :search, params: { invalid_param: 'invalid' }
 
-      expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:not_found)
+      end
     end
-  end
 
-  context "when searching by email" do
-    it "returns users matching the email" do
-      get :search, params: { email: 'john@example.com' }
+    context "when searching by email" do
+      it "returns users matching the email" do
+        get :search, params: { email: 'john@example.com' }
 
-      expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(:success)
 
-      parsed_response = JSON.parse(response.body)
-      expect(parsed_response.length).to eq(1)
-      expect(parsed_response[0]['email']).to eq('john@example.com')
+        parsed_response = JSON.parse(response.body)
+        expect(parsed_response.length).to eq(1)
+        expect(parsed_response[0]['email']).to eq('john@example.com')
+      end
     end
-  end
 
-  context "when searching with a very long string" do
-    it "handles the search gracefully" do
-      long_string = 'a' * 500
-      get :search, params: { name: long_string }
-      expect(response).to have_http_status(:not_found)
+    context "when searching with a very long string" do
+      it "handles the search gracefully" do
+        long_string = 'a' * 500
+        get :search, params: { name: long_string }
+        expect(response).to have_http_status(:not_found)
+      end
     end
-  end
 
-  context "when searching with special characters" do
-    it "handles the search gracefully" do
-      get :search, params: { name: 'John @Doe!' }
-      expect(response).to have_http_status(:success) # Adjust as per your application's behavior
-      # Additional expectations
+    context "when searching with special characters" do
+      it "handles the search gracefully" do
+        get :search, params: { name: 'John @Doe!' }
+        expect(response).to have_http_status(:success) # Adjust as per your application's behavior
+        # Additional expectations
+      end
     end
-  end
 
-  context "when an SQL injection attack is attempted" do
-    it "does not succumb to SQL injection" do
-      get :search, params: { name: "' UPDATE '1'='1" }
-      expect(response).to have_http_status(:bad_request) # or :success with no harmful effect
-      # Ensure that the response does not indicate a successful SQL injection
+    context "when an SQL injection attack is attempted" do
+      it "does not succumb to SQL injection" do
+        get :search, params: { name: "' UPDATE '1'='1" }
+        expect(response).to have_http_status(:bad_request) # or :success with no harmful effect
+        # Ensure that the response does not indicate a successful SQL injection
+      end
     end
-  end
 
-  context "when searching with multiple parameters" do
-    it "returns users matching all criteria" do
-      get :search, params: { name: 'John Doe', email: 'john@example.com' }
-      expect(response).to be_successful
-      expect(json.length).to eq(1)
+    context "when searching with multiple parameters" do
+      it "returns users matching all criteria" do
+        get :search, params: { name: 'John Doe', email: 'john@example.com' }
+        expect(response).to be_successful
+
+        parsed_response = JSON.parse(response.body)
+        expect(parsed_response.count).to eq(1)
+      end
     end
   end
 end
