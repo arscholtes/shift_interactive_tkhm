@@ -1,7 +1,11 @@
+# spec/factories/users.rb
+require 'faker'
+
 FactoryBot.define do
   factory :user do
-    name { "John Smith" }
-    email { "john@example.com" }
-    phone { "1234567890" }
+    name { Faker::Name.name }
+    email { Faker::Internet.unique.email }
+    phone { Faker::PhoneNumber.cell_phone }
+    company_name { Faker::Company.name }
   end
 end

@@ -1,9 +1,12 @@
+# spec/factories/addresses.rb
+require 'faker'
+
 FactoryBot.define do
   factory :address do
-    street { "Main St" }
-    suite { "321"}
-    city { "Chicago" }
-    zipcode { "60504" }
+    street { Faker::Address.street_name }
+    suite { Faker::Address.secondary_address }
+    city { Faker::Address.city }
+    zipcode { Faker::Address.zip_code }
     user
   end
 end

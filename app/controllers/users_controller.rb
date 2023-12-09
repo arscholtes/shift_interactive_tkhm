@@ -5,16 +5,50 @@ class UsersController < ApplicationController
     render json: users, include: :address
   end
 
-  # GET /users/search
   def search
-    search_params = user_search_params
-    users = User.joins(:address).where(build_user_query(search_params)).where(addresses: build_address_query(search_params))
-    render json: users
+    if sql_injection_attempted?(user_search_params)
+      render json: { error: 'Bad Request' }, status: :bad_request
+      return
+    end
+
+    users = User.where(sanitize_params(user_search_params))
+
+    if users.empty?
+      render json: { error: 'No users found matching the search criteria' }, status: :not_found
+    else
+      render json: users
+    end
   rescue StandardError => e
     render json: { error: e.message }, status: :internal_server_error
   end
 
+  # def search
+  #   search_params = user_search_params
+  #
+  #   users = User.where(search_params)
+  #
+  #   if users.empty?
+  #     render json: { error: 'No users found matching the search criteria' }, status: :not_found
+  #   else
+  #     render json: users
+  #   end
+  # rescue StandardError => e
+  #   render json: { error: e.message }, status: :internal_server_error
+  # end
+
   private
+
+  def sql_injection_attempted?(params)
+    injection_patterns = [/--/, /;/, /select\b/i, /insert\b/i, /update\b/i, /delete\b/i, /drop\b/i]
+    params.values.any? do |value|
+      injection_patterns.any? { |pattern| value.to_s.match(pattern) }
+    end
+  end
+
+  def sanitize_params(params)
+    allowed_params = [:name, :email, :phone, :zipcode, :company_name, :street]
+    params.slice(*allowed_params)
+  end
 
   def record_not_found
     render json: { error: "Record not found" }, status: :not_found
@@ -22,21 +56,5 @@ class UsersController < ApplicationController
 
   def user_search_params
     params.permit(:name, :email, :phone, :zipcode, :company_name, :street)
-  end
-
-  def build_user_query(params)
-    query = {}
-    query[:name] = params[:name] if params[:name].present?
-    query[:email] = params[:email] if params[:email].present?
-    query[:phone] = params[:phone] if params[:phone].present?
-    query[:company_name] = params[:company_name] if params[:company_name].present?
-    query
-  end
-
-  def build_address_query(params)
-    query = {}
-    query[:street] = params[:street] if params[:street].present?
-    query[:zipcode] = params[:zipcode] if params[:zipcode].present?
-    query
   end
 end
