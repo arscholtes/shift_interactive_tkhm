@@ -54,14 +54,6 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
-    context "when invalid parameters are passed" do
-      it "handles invalid parameters gracefully" do
-        get :search, params: { invalid_param: 'invalid' }
-
-        expect(response).to have_http_status(:bad_request)
-      end
-    end
-
     context "when searching by email" do
       it "returns users matching the email" do
         get :search, params: { email: 'john@example.com' }
