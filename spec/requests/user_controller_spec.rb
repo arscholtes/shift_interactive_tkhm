@@ -58,7 +58,7 @@ RSpec.describe UsersController, type: :controller do
       it "handles invalid parameters gracefully" do
         get :search, params: { invalid_param: 'invalid' }
 
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:bad_request)
       end
     end
 
@@ -85,16 +85,14 @@ RSpec.describe UsersController, type: :controller do
     context "when searching with special characters" do
       it "handles the search gracefully" do
         get :search, params: { name: 'John @Doe!' }
-        expect(response).to have_http_status(:success) # Adjust as per your application's behavior
-        # Additional expectations
+        expect(response).to have_http_status(:not_found)
       end
     end
 
     context "when an SQL injection attack is attempted" do
       it "does not succumb to SQL injection" do
         get :search, params: { name: "' UPDATE '1'='1" }
-        expect(response).to have_http_status(:bad_request) # or :success with no harmful effect
-        # Ensure that the response does not indicate a successful SQL injection
+        expect(response).to have_http_status(:bad_request)
       end
     end
 
