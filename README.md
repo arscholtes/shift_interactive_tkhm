@@ -1,5 +1,5 @@
 # Rails API for User Management
-
+- API Documentation: http://localhost:3000/api-docs/index.html
 ## Overview
 
 This Rails API provides functionalities for managing users and their addresses. It includes creating, listing, searching, and handling user data with associated address information.
