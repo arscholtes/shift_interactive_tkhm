@@ -2,17 +2,16 @@ class UsersController < ApplicationController
   # GET /users
   def index
     users = User.all.includes(:address)
-    render json: users, include: :address
+    render json: users
   end
 
   def search
-    binding.pry
     if sql_injection_attempted?(user_search_params) || !valid_params?(user_search_params)
       render json: { error: 'Bad Request' }, status: :bad_request
       return
     end
 
-    users = User.where(sanitize_params(user_search_params))
+    users = User.where(sanitize_params(user_search_params)).includes(:address)
 
     if users.empty?
       render json: { error: 'No users found matching the search criteria' }, status: :not_found

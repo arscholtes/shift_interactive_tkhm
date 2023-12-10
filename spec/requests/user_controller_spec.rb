@@ -97,5 +97,26 @@ RSpec.describe UsersController, type: :controller do
         expect(parsed_response.count).to eq(1)
       end
     end
+
+    context "when a matching user is found" do
+      let!(:user) { create(:user, name: 'Remy Remington', email: 'remy@example.com') }
+      let!(:address) { create(:address, user: user) }
+
+      it "returns all data associated with the user" do
+        get :search, params: { name: 'Remy Remington' }
+        expect(response).to be_successful
+
+        parsed_response = JSON.parse(response.body)
+        expect(parsed_response.length).to eq(1)
+        user_response = parsed_response.first
+        puts user_response
+
+        expect(user_response['id']).to eq(user.id)
+        expect(user_response['name']).to eq(user.name)
+        expect(user_response['email']).to eq(user.email)
+        expect(user_response['address']['id']).to eq(address.id)
+        expect(user_response['address']['street']).to eq(address.street)
+      end
+    end
   end
 end
