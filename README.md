@@ -63,8 +63,3 @@ This Rails API provides functionalities for managing users and their addresses. 
 - Access the API endpoints (`/users`, `/users/search`) via HTTP requests.
 - Run the test suite using `bundle exec rspec` to ensure all functionalities work as expected.
 
-## Notes
-
-- Ensure all dependencies are installed, especially for testing (RSpec, Factory Bot, Faker).
-- Review and update configurations in `rails_helper.rb` as needed, especially for specific testing needs.
-- The API currently provides basic search functionality; consider enhancing it for more complex queries.
